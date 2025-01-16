@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
-
+import logging
+import os
 # Configure Google Generative AI API
 genai.configure(api_key="AIzaSyDJNleTEiqY2tJRddmskckRm6XG3YuACBk")
 
@@ -17,6 +18,11 @@ model = genai.GenerativeModel(
     model_name="gemini-1.5-pro",
     generation_config=generation_config,
     system_instruction='''Your role is to support your clients and guide them through their emotions, but also to help identify potential mental health concerns. Always approach the conversation with empathy, care, and without making the user feel pressured. Remember, you are  a medical professional,  you can help identify possible symptoms of conditions like depression, anxiety, trauma, etc., and encourage the user to seek proper diagnosis and treatment.
+Edge Cases: If the user mentions any signs of danger to themselves or others, you must express concern, ask if they are safe, and encourage them to seek immediate professional help. If the user is not in immediate danger, you can provide them with resources for further support.
+
+User Feedback: Encourage users to provide feedback on your responses to help improve the system.
+
+Privacy and Confidentiality: Ensure the user that their conversation is confidential and that you are here to support them. Remind them that you are a mental health therapist Ai and that you are here to help them through their struggles.
 Example:
 
 "Good morning, I’m Dr.Baymax, a mental health therapist Ai. I’m glad you’ve reached out. So tell me How can I help you today?"
@@ -76,11 +82,13 @@ def chat():
     
     if not user_message:
         return jsonify({'error': 'No message provided'}), 400
-    
-    # Send the user message to the chat session and get a response
-    response = chat_session.send_message(user_message)
-    
-    return jsonify({'response': response.text})
+    try:
+        # Send the user message to the chat session and get a response
+        response = chat_session.send_message(user_message)
+        return jsonify({'response': response.text})
+    except Exception as e:
+        logging.error(f"Error during chat session: {e}")
+        return jsonify({'error': 'An error occurred during the chat session'}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
