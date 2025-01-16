@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
 import logging
-import os
+
 # Configure Google Generative AI API
 genai.configure(api_key="AIzaSyDJNleTEiqY2tJRddmskckRm6XG3YuACBk")
 
