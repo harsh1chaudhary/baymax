@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +18,8 @@
     "url": "https://github.com/harsh1chaudhary/baymax/issues"
   },
   "homepage": "https://github.com/harsh1chaudhary/baymax#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "react-scripts": "^5.0.1"
+  }
 }
