@@ -5,7 +5,7 @@ import logging
 app = Flask(__name__, static_folder='public')
 from flask_cors import CORS
 
-CORS(app)
+CORS(app, resources={r"/chat": {"origins": "https://baymax-11.netlify.app"}})
 # Configure Google Generative AI API
 genai.configure(api_key="AIzaSyDJNleTEiqY2tJRddmskckRm6XG3YuACBk")
 
@@ -15,7 +15,7 @@ generation_config = {
     "top_p": 0.95,
     "top_k": 40,
     "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
+    "response_mime_type": "text/plain"
 }
 
 # Initialize the model
