@@ -1,9 +1,14 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
 import google.generativeai as genai
+from flask_cors import CORS
+
+# Enable CORS for all routes
+
 
 # Create Flask app with static folder configuration
 app = Flask(__name__, static_folder='public')
 
+CORS(app)
 # Configure Google Generative AI API
 genai.configure(api_key="AIzaSyDJNleTEiqY2tJRddmskckRm6XG3YuACBk")
 
