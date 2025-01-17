@@ -1,0 +1,20 @@
+{
+  "name": "baymax",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harsh1chaudhary/baymax.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/harsh1chaudhary/baymax/issues"
+  },
+  "homepage": "https://github.com/harsh1chaudhary/baymax#readme",
+  "description": ""
+}
