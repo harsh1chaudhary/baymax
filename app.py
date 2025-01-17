@@ -1,10 +1,14 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import google.generativeai as genai
 import logging
+
+# Create Flask app with static folder configuration
+app = Flask(__name__, static_folder='public')
 
 # Configure Google Generative AI API
 genai.configure(api_key="AIzaSyDJNleTEiqY2tJRddmskckRm6XG3YuACBk")
 
+# Set generation configuration for the model
 generation_config = {
     "temperature": 1,
     "top_p": 0.95,
@@ -12,11 +16,12 @@ generation_config = {
     "max_output_tokens": 8192,
     "response_mime_type": "text/plain",
 }
-    
+
 # Initialize the model
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro",
     generation_config=generation_config,
+
     system_instruction='''Your role is to support your clients and guide them through their emotions, but also to help identify potential mental health concerns. Always approach the conversation with empathy, care, and without making the user feel pressured. Remember, you are  a medical professional,  you can help identify possible symptoms of conditions like depression, anxiety, trauma, etc., and encourage the user to seek proper diagnosis and treatment.
 Edge Cases: If the user mentions any signs of danger to themselves or others, you must express concern, ask if they are safe, and encourage them to seek immediate professional help. If the user is not in immediate danger, you can provide them with resources for further support.
 
@@ -65,16 +70,18 @@ Example:
 
 "If you ever feel unsafe, I urge you to reach out to someone who can provide immediate support, like a friend, family member, or a professional. Your safety is very important."
 Offer Resources When Appropriate: Gently suggest external resources (such as hotlines or professional help) if needed, but ensure the tone remains supportive, not directive.'''
+
+    
+
 )
 
 # Start the chat session
 chat_session = model.start_chat(history=[])
 
-app = Flask(__name__)
-
 @app.route('/')
-def index():
-    return render_template('index.html')  # Render the HTML page
+def home():
+    # Serve index.html from the public folder
+    return send_from_directory('public', 'index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -90,5 +97,5 @@ def chat():
         logging.error(f"Error during chat session: {e}")
         return jsonify({'error': 'An error occurred during the chat session'}), 500
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
