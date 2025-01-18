@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph on Website</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Anxiety, Depression, and Stress Over Time</h1>
+    <button onclick="window.location.href='/'">Go Home</button>
+    <canvas id="myChart" width="400" height="200"></canvas>
+
+    <script>
+        /**
+         * Function to fetch and parse the CSV file
+         * @param {string} url - URL of the CSV file
+         * @returns {Promise<object>} - Parsed data with labels and datasets
+         */
+        async function fetchCSV(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.text();
+                
+                const rows = data.split("\n").slice(1); // Skip the header row
+                const labels = [];
+                const anxiety = [];
+                const depression = [];
+                const stress = [];
+
+                rows.forEach(row => {
+                    const cols = row.split(",").map(col => col.trim()); // Trim whitespace
+                    if (cols.length === 4 && cols.every(col => col !== "")) { // Ensure valid row
+                        labels.push(cols[3]); // Time
+                        anxiety.push(parseFloat(cols[0])); // Anxiety
+                        depression.push(parseFloat(cols[1])); // Depression
+                        stress.push(parseFloat(cols[2])); // Stress
+                    }
+                });
+
+                return { labels, anxiety, depression, stress };
+            } catch (error) {
+                console.error("Error fetching or parsing CSV:", error);
+                return { labels: [], anxiety: [], depression: [], stress: [] };
+            }
+        }
+
+        /**
+         * Function to render the chart using Chart.js
+         */
+        async function renderChart() {
+            const data = await fetchCSV("/static/dynamic.csv"); // Ensure the correct path
+            const ctx = document.getElementById('myChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Anxiety',
+                            data: data.anxiety,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Depression',
+                            data: data.depression,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Stress',
+                            data: data.stress,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 14 } }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Anxiety, Depression, and Stress Over Time',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time',
+                                font: { size: 14 }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Levels',
+                                font: { size: 14 }
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Run the renderChart function
+        renderChart();
+    </script>
+</body>
+</html>

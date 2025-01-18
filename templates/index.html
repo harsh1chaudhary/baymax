@@ -70,6 +70,12 @@
         </div>
         <input type="text" id="user-message" placeholder="Type a message..." />
         <button onclick="sendMessage()">Send</button>
+
+        <!-- Graph Button -->
+        <br><br>
+       
+        <button onclick="window.location.href='/graph'">Go to Graph</button>
+      
     </div>
 
     <script>
@@ -81,7 +87,7 @@
             appendMessage('user', message);
 
             // Send the message to the Flask API
-            const response = await fetch('http://127.0.0.1:5000/chat', {
+            const response = await fetch('/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
