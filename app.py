@@ -17,7 +17,7 @@ from flask_cors import CORS
 
 
 
-genai.configure(api_key="AIzaSyDHqx-cO7gyMH0JjH8dendrUt_Q5v3m9LY")
+genai.configure(api_key="")
 def extract_digits(text):
     digits = [int(digit) for digit in ''.join(re.findall(r'\d+', text))]
     
