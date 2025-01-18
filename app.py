@@ -1,17 +1,22 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory
 import google.generativeai as genai
+from google.cloud import speech_v1p1beta1 as speech
 import logging
 import os
 import pandas as pd
 import csv
 import re
 from datetime import datetime
+import dotenv
+from dotenv import load_dotenv
+
+load_dotenv()
 # Create Flask app with static folder configuration
 app = Flask(__name__)
 from flask_cors import CORS
 
-CORS(app, resources={r"/chat": {"origins": "https://baymax-11.netlify.app"}})
-# Configure Google Generative AI API
+
+
 genai.configure(api_key="AIzaSyDHqx-cO7gyMH0JjH8dendrUt_Q5v3m9LY")
 def extract_digits(text):
     digits = [int(digit) for digit in ''.join(re.findall(r'\d+', text))]
@@ -104,7 +109,8 @@ out put: "starting-chat-09012 Ahmm , Lets do some breathing exercises which can 
  if user say accepted then :
  output : " sit back , take deep breath , now release it , now take it ."pause for some time in between respiration
 
-
+Allow users to track their mental health progress over time by logging their moods, stress levels, and coping strategies used.
+Provide feedback and insights into their mental health journey, including patterns, improvements, or areas that need attention.
 
 
 Professional Boundaries: If the user mentions any signs of danger to themselves or others, you must express concern, ask if they are safe, and encourage them to seek immediate professional help.
@@ -126,8 +132,8 @@ model1 = genai.GenerativeModel(
   model_name="gemini-2.0-flash-thinking-exp-1219",
   generation_config=generation_config1,
   system_instruction=''' You are a bot designed to analyze user sentiments and calibrate the levels of anxiety, stress, and depression on a scale of 0 to 10. However, if the user’s emotional state indicates a danger or alert level like ending itself life, 
-  the scale can extend up to 15 to reflect the heightened intensity. Do not explain your process or show any inner thoughts; simply provide the calibrated levels based on the user's input ands its past chats .
-
+  the scale can extend up to 20 to reflect the level of anxiety, stress, and depression will go high more than 10 . Do not explain your process or show any inner thoughts; simply provide the calibrated levels based on the user's input ands its past chats .
+if user is having sucidal thought , want to danger lives , make the level of anxiety, stress, and depression all 20
 Example:
 
 User: "I am feeling very nervous and stressed today due to exam pressure."
@@ -138,7 +144,10 @@ This makes it clear how to handle extreme emotional states with the extended sca
 
 
 Here are more examples to illustrate how the calibration works with both the standard and extended scale:
+Example 0:
 
+User: "I want to sucide"
+Output: Anxiety: 13, Stress: 12, Depression: 12
 Example 1:
 
 User: "I’m feeling a bit uneasy, but I think I’ll be okay."
@@ -146,7 +155,7 @@ Output: Anxiety: 3, Stress: 2, Depression: 1
 Example 2:
 
 User: "I’m so stressed about meeting this deadline. I can’t seem to focus!"
-Output: Anxiety: 7, Stress: 8, Depression: 4
+Output: Anxiety: 7, Stress: 8, Depression: 10
 Example 3:
 
 User: "I’ve been feeling sad and unmotivated for weeks. Nothing seems to make me happy."
@@ -162,7 +171,7 @@ Output: Anxiety: 15, Stress: 15, Depression: 14
 Example 6 (Mild Emotional State):
 
 User: "I had a tough day, but I’m okay now. Just a little tired."
-Output: Anxiety: 2, Stress: 3, Depression: 1
+Output: Anxiety: 1, Stress: 3, Depression: 3
 Example 7:
 
 User: "I feel completely drained, like there’s no way out of this mess."
@@ -213,14 +222,20 @@ def print_after_hero(sentence):
         hero_index = words.index("starting-chat-09012")
         return (" ".join(words[hero_index + 1:]))
 
+dt=['death','sucide',"end live",'not live','dead','die','kill']
 @app.route('/chat', methods=['POST'])
 
 
 def chat():
     user_message = request.json.get('message')
-    
+
     response1 = chat_session1.send_message(user_message)
     digit_data=extract_digits(response1.text)
+    if any(word in user_message for word in dt):
+        digit_data[0][0]=17
+        digit_data[0][1]=16
+        digit_data[0][2]=20
+    
     new_rows=[[digit_data[0][0],digit_data[0][1],digit_data[0][2],digit_data[1]]]
     with open("baymax/static/dynamic.csv", mode="a", newline="") as file:
         writer = csv.writer(file)
